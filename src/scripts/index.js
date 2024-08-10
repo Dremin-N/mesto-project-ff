@@ -1,3 +1,6 @@
+import { initialCards } from "./cards.js";
+import "../pages/index.css";
+
 const placesList = document.querySelector(".places__list");
 const cardTemplate = document.querySelector("#card-template").content;
 
@@ -29,3 +32,12 @@ function renderedElems(data, listContainer) {
 }
 
 renderedElems(initialCards, placesList);
+
+console.log("Hello world");
+
+const numbers = [2, 3, 5];
+
+// Стрелочная функция. Не запнётся ли на ней Internet Explorer?
+const doubledNumbers = numbers.map((number) => number * 2);
+
+console.log(doubledNumbers); // 4, 6, 10
