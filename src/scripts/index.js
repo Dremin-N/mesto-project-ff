@@ -1,29 +1,20 @@
 import { initialCards } from "./cards.js";
+import { openModal, closeModal, editNameModal, addCard } from "./modal.js";
+import { createCard, onDelete } from "./card.js";
 import "../pages/index.css";
 
+// Переменные для темплейта карточки и контейнера
 const placesList = document.querySelector(".places__list");
-const cardTemplate = document.querySelector("#card-template").content;
 
-function createCard(data, deleteCard) {
-  const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
-  const cardImage = cardElement.querySelector(".card__image");
-  const cardTitle = cardElement.querySelector(".card__title");
-  const cardDeleteButton = cardElement.querySelector(".card__delete-button");
+//Переменные для формы редактирования
+const editButton = document.querySelector(".profile__edit-button");
+const popupEdit = document.querySelector(".popup_type_edit");
+const formEdit = document.forms["edit-profile"];
 
-  cardImage.src = data.link;
-  cardImage.alt = data.name;
-  cardTitle.innerText = data.name;
-
-  cardDeleteButton.addEventListener("click", () => {
-    deleteCard(cardElement);
-  });
-
-  return cardElement;
-}
-
-function onDelete(elem) {
-  elem.remove();
-}
+// Переменные для формы добавления карточки
+const addButton = document.querySelector(".profile__add-button");
+const popupAdd = document.querySelector(".popup_type_new-card");
+const formAddCard = document.forms["new-place"];
 
 function renderedElems(data, listContainer) {
   data.forEach((item) => {
@@ -33,11 +24,22 @@ function renderedElems(data, listContainer) {
 
 renderedElems(initialCards, placesList);
 
-console.log("Hello world");
+editButton.addEventListener("click", () => {
+  openModal(popupEdit);
+});
 
-const numbers = [2, 3, 5];
+addButton.addEventListener("click", () => {
+  openModal(popupAdd);
+});
 
-// Стрелочная функция. Не запнётся ли на ней Internet Explorer?
-const doubledNumbers = numbers.map((number) => number * 2);
+formEdit.addEventListener("submit", (event) => {
+  event.preventDefault();
+  editNameModal(formEdit);
+  closeModal(popupEdit);
+});
 
-console.log(doubledNumbers); // 4, 6, 10
+formAddCard.addEventListener("submit", (event) => {
+  addCard(event);
+
+  placesList.prepend(createCard(initialCards[0], onDelete));
+});
