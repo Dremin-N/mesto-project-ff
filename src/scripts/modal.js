@@ -1,5 +1,3 @@
-import { initialCards } from "./cards";
-
 // Открытие модалки
 function openModal(modal) {
   modal.classList.add("popup_is-opened");
@@ -34,34 +32,4 @@ function closeModalOverlay(event) {
   }
 }
 
-// Функция редактирования имени и описания в профиле
-function editNameModal(form) {
-  const nameFormEdit = form.elements.name;
-  const descriptionFormEdit = form.elements.description;
-  const profileTitle = document.querySelector(".profile__title");
-  const profileDescription = document.querySelector(".profile__description");
-
-  profileTitle.textContent = nameFormEdit.value;
-  profileDescription.textContent = descriptionFormEdit.value;
-}
-
-// функция добавления новой карточки
-function addCard(event) {
-  event.preventDefault();
-
-  const formAddCard = document.forms["new-place"];
-  const placeNameinput = formAddCard.elements["place-name"];
-  const linkInput = formAddCard.elements["link"];
-  const elem = {
-    name: placeNameinput.value,
-    link: linkInput.value,
-  };
-  initialCards.unshift(elem);
-
-  placeNameinput.value = "";
-  linkInput.value = "";
-
-  closeModal(document.querySelector(".popup_is-opened"));
-}
-
-export { openModal, closeModal, editNameModal, addCard };
+export { openModal, closeModal };
