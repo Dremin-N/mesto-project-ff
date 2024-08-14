@@ -1,12 +1,7 @@
-import { openModal } from "./modal";
-
 const cardTemplate = document.querySelector("#card-template").content;
 
-// переменная для формы с раскрытием изображения
-const popupImage = document.querySelector(".popup_type_image");
-
 // Функция создания карточки
-function createCard(data, deleteCard, addLike) {
+function createCard(data, deleteCard, addLike, openPopupImage) {
   const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
   const cardImage = cardElement.querySelector(".card__image");
   const cardTitle = cardElement.querySelector(".card__title");
@@ -15,15 +10,10 @@ function createCard(data, deleteCard, addLike) {
 
   cardImage.src = data.link;
   cardImage.alt = data.name;
-  cardTitle.innerText = data.name;
+  cardTitle.textContent = data.name;
 
   // Обработчик открытия формы при клике на изображение
-  cardImage.addEventListener("click", () => {
-    document.querySelector(".popup__image").src = cardImage.src;
-    document.querySelector(".popup__image").alt = cardImage.alt;
-    document.querySelector(".popup__caption").innerText = cardTitle.innerText;
-    openModal(popupImage);
-  });
+  cardImage.addEventListener("click", openPopupImage);
 
   // Обработчик удаления карточки при клике на крестик
   cardDeleteButton.addEventListener("click", () => {

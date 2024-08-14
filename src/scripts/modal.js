@@ -1,10 +1,6 @@
 // Открытие модалки
 function openModal(modal) {
   modal.classList.add("popup_is-opened");
-  const closeButton = modal.querySelector(".popup__close");
-  closeButton.addEventListener("click", () => {
-    closeModal(modal);
-  });
 
   window.addEventListener("keydown", closeModalEsc);
   modal.addEventListener("click", closeModalOverlay);
@@ -28,7 +24,7 @@ function closeModalEsc(event) {
 // закрытие модалки кликом на overlay
 function closeModalOverlay(event) {
   if (event.target.classList.contains("popup")) {
-    closeModal(document.querySelector(".popup_is-opened"));
+    closeModal(event.target);
   }
 }
 
