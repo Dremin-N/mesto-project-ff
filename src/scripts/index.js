@@ -1,6 +1,14 @@
-import { initialCards } from "./cards.js";
 import { openModal, closeModal } from "./modal.js";
 import { createCard, onDelete, addLike } from "./card.js";
+import { clearValidation, enableValidation } from "./validation.js";
+import {
+  getHeaderValues,
+  getInitialCards,
+  changeProfileValues,
+  addNewCard,
+  countLikeCard,
+  checkCardOwner,
+} from "./api.js";
 import "../pages/index.css";
 
 // Переменная для контейнера карточки
@@ -14,6 +22,7 @@ const nameFormEdit = formEdit.elements.name;
 const descriptionFormEdit = formEdit.elements.description;
 const profileTitle = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
+const avatar = document.querySelector(".profile__image");
 
 // Переменные для формы добавления карточки
 const addButton = document.querySelector(".profile__add-button");
@@ -28,7 +37,16 @@ const popupImageCaption = document.querySelector(".popup__caption");
 // Функция рендера элементов в контейнере
 function renderedElems(data, listContainer) {
   data.forEach((item) => {
-    listContainer.append(createCard(item, onDelete, addLike, openPopupImage));
+    listContainer.append(
+      createCard(
+        item,
+        onDelete,
+        addLike,
+        openPopupImage,
+        countLikeCard,
+        checkCardOwner
+      )
+    );
   });
 }
 
@@ -38,6 +56,7 @@ function editNameModal(event) {
 
   profileTitle.textContent = nameFormEdit.value;
   profileDescription.textContent = descriptionFormEdit.value;
+  changeProfileValues(profileTitle.textContent, profileDescription.textContent);
 
   closeModal(popupEdit);
 }
@@ -57,6 +76,7 @@ function addCard(event) {
   linkInput.value = "";
 
   placesList.prepend(createCard(elem, onDelete, addLike, openPopupImage));
+  addNewCard(elem.name, elem.link);
 
   closeModal(popupAdd);
 }
@@ -70,17 +90,22 @@ const openPopupImage = (event) => {
   openModal(popupImage);
 };
 
-renderedElems(initialCards, placesList);
+// Первоначальный рендер карточек
+getInitialCards().then((cards) => {
+  renderedElems(cards, placesList);
+});
 
 // Обработчики открытия модальных окон
 editButton.addEventListener("click", () => {
   nameFormEdit.value = profileTitle.textContent;
   descriptionFormEdit.value = profileDescription.textContent;
 
+  clearValidation(formEdit);
   openModal(popupEdit);
 });
 
 addButton.addEventListener("click", () => {
+  clearValidation(formAddCard);
   openModal(popupAdd);
 });
 
@@ -102,3 +127,7 @@ formEdit.addEventListener("submit", editNameModal);
 
 // Обработчик добавления новой карточки
 formAddCard.addEventListener("submit", addCard);
+
+enableValidation();
+
+getHeaderValues(profileTitle, profileDescription, avatar);
