@@ -4,10 +4,11 @@ const cardTemplate = document.querySelector("#card-template").content;
 function createCard(
   data,
   deleteCard,
-  addLike,
   openPopupImage,
-  countLikes,
-  checkOwner
+  userId,
+  deleteCardFromServer,
+  putLike,
+  deleteLike
 ) {
   const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
   const cardImage = cardElement.querySelector(".card__image");
@@ -26,16 +27,40 @@ function createCard(
   // Обработчик удаления карточки при клике на корзину
   cardDeleteButton.addEventListener("click", () => {
     deleteCard(cardElement);
+    deleteCardFromServer(data._id);
   });
 
   // Проверяем кто создатель карточки, если не я - убираем кнопку удаления
-  checkOwner(data.owner["_id"], cardDeleteButton);
-
-  // Обработчик добавления/убирания лайка
-  cardLikeButton.addEventListener("click", addLike);
+  if (data.owner._id !== userId) {
+    cardDeleteButton.remove();
+  }
 
   // Получаем количество лайков на карточке
-  countLikes(cardLikeCounter);
+  cardLikeCounter.textContent = data.likes.length;
+
+  // Проверяем лайкал ли user
+  if (data.likes.some((like) => like._id === userId)) {
+    cardLikeButton.classList.add("card__like-button_is-active");
+  }
+
+  //Вешаем слушатель для лайка
+  cardLikeButton.addEventListener("click", () => {
+    if (cardLikeButton.classList.contains("card__like-button_is-active")) {
+      deleteLike(data._id)
+        .then((updateCard) => {
+          cardLikeCounter.textContent = updateCard.likes.length;
+          cardLikeButton.classList.remove("card__like-button_is-active");
+        })
+        .catch((err) => console.log(err));
+    } else {
+      putLike(data._id)
+        .then((updateCard) => {
+          cardLikeCounter.textContent = updateCard.likes.length;
+          cardLikeButton.classList.add("card__like-button_is-active");
+        })
+        .catch((err) => console.log(err));
+    }
+  });
 
   return cardElement;
 }
@@ -45,9 +70,4 @@ function onDelete(elem) {
   elem.remove();
 }
 
-// Функция лайка
-function addLike(event) {
-  event.target.classList.toggle("card__like-button_is-active");
-}
-
-export { createCard, onDelete, addLike };
+export { createCard, onDelete };
