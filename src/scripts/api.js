@@ -15,20 +15,6 @@ const checkFetchStatus = function (res) {
   }
 };
 
-function getHeaderValues(name, about, avatar) {
-  fetch(`${config.baseUrl}/users/me`, {
-    method: "GET",
-    headers: config.headers,
-  })
-    .then(checkFetchStatus)
-    .then((res) => {
-      name.textContent = res.name;
-      about.textContent = res.about;
-      avatar.style.backgroundImage = `url(${res.avatar})`;
-    })
-    .catch((err) => console.log(err));
-}
-
 function getInitialCards() {
   return fetch(`${config.baseUrl}/cards`, {
     method: "GET",
@@ -44,7 +30,7 @@ function getDataUser() {
 }
 
 function changeProfileValues(name, description) {
-  fetch(`${config.baseUrl}/users/me`, {
+  return fetch(`${config.baseUrl}/users/me`, {
     method: "PATCH",
     headers: config.headers,
     body: JSON.stringify({
@@ -97,7 +83,6 @@ function updateAvatar(avatar) {
 }
 
 export {
-  getHeaderValues,
   getInitialCards,
   getDataUser,
   changeProfileValues,

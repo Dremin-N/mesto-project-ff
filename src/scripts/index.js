@@ -2,7 +2,6 @@ import { openModal, closeModal } from "./modal.js";
 import { createCard, onDelete, addLike } from "./card.js";
 import { clearValidation, enableValidation } from "./validation.js";
 import {
-  getHeaderValues,
   getInitialCards,
   changeProfileValues,
   getDataUser,
@@ -61,17 +60,24 @@ function renderCards(data, userId) {
 // Функция редактирования имени и описания в профиле
 function editNameModal(event) {
   event.preventDefault();
+  renderLoader(true, event.target);
 
-  profileTitle.textContent = nameFormEdit.value;
-  profileDescription.textContent = descriptionFormEdit.value;
-  changeProfileValues(profileTitle.textContent, profileDescription.textContent);
-
-  closeModal(popupEdit);
+  changeProfileValues(nameFormEdit.value, descriptionFormEdit.value)
+    .then((profile) => {
+      profileTitle.textContent = profile.name;
+      profileDescription.textContent = profile.about;
+    })
+    .catch((err) => console.log(err))
+    .finally(() => {
+      renderLoader(false, event.target);
+      closeModal(popupEdit);
+    });
 }
 
 // функция добавления новой карточки
 function addCard(event) {
   event.preventDefault();
+  renderLoader(true, event.target);
 
   const placeNameinput = formAddCard.elements["place-name"];
   const linkInput = formAddCard.elements["link"];
@@ -97,23 +103,29 @@ function addCard(event) {
         )
       );
     })
-    .catch((err) => console.log(err));
-
-  closeModal(popupAdd);
+    .catch((err) => console.log(err))
+    .finally(() => {
+      closeModal(popupAdd);
+      renderLoader(false, event.target);
+    });
 }
 
 // Функция смены аватара
 function changeAvatar(evt) {
   evt.preventDefault();
+  renderLoader(true, evt.target);
 
   const avatarlink = formAvatar.elements.avatar;
   updateAvatar(avatarlink.value)
     .then((avatar) => {
-      profileImage.backgroundImage = `url(${avatar})`;
+      profileImage.style.backgroundImage = `url(${avatar})`;
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.log(err))
+    .finally(() => {
+      closeModal(popupAvatar);
+      renderLoader(false, evt.target);
+    });
 
-  closeModal(popupAvatar);
   avatarlink.value = "";
 }
 
@@ -126,19 +138,32 @@ const openPopupImage = (event) => {
   openModal(popupImage);
 };
 
-// Первоначальный рендер карточек
+// Функция отображения лоадера
+function renderLoader(isLoading, form) {
+  const button = form.querySelector(".button");
+  const initialValue = "Сохранить";
+
+  if (isLoading) {
+    button.textContent = "Сохранение...";
+  } else {
+    button.textContent = initialValue;
+  }
+}
+
+function renderProfileData(userData) {
+  profileTitle.textContent = userData.name;
+  profileDescription.textContent = userData.about;
+  profileImage.style.backgroundImage = `url(${userData.avatar})`;
+}
+
+// Первоначальный рендер карточек и данных профиля
 Promise.all([getInitialCards(), getDataUser()])
   .then(([cards, userData]) => {
     const userId = userData._id;
     renderCards(cards, userId);
+    renderProfileData(userData);
   })
   .catch((err) => console.log(err));
-
-// Выводим данные профиля
-getHeaderValues(profileTitle, profileDescription, profileImage);
-
-// Включаем валидацию
-enableValidation();
 
 // Обработчики открытия модальных окон
 editButton.addEventListener("click", () => {
@@ -184,3 +209,6 @@ formAddCard.addEventListener("submit", addCard);
 
 // Обработчик обновления аватара
 formAvatar.addEventListener("submit", changeAvatar);
+
+// Включаем валидацию
+enableValidation();

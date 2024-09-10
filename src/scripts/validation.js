@@ -81,7 +81,6 @@ function clearValidation(formElement) {
 
 function enableValidation() {
   const formList = Array.from(document.querySelectorAll(settings.formSelector));
-  console.log(formList);
   formList.forEach((formElement) => {
     setEventListeners(formElement);
   });
