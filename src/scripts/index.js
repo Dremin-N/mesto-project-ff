@@ -1,6 +1,10 @@
 import { openModal, closeModal } from "./modal.js";
-import { createCard, onDelete, addLike } from "./card.js";
-import { clearValidation, enableValidation } from "./validation.js";
+import { createCard, onDelete } from "./card.js";
+import {
+  clearValidation,
+  enableValidation,
+  settingsValidation,
+} from "./validation.js";
 import {
   getInitialCards,
   changeProfileValues,
@@ -15,6 +19,9 @@ import "../pages/index.css";
 
 // Переменная для контейнера карточки
 const placesList = document.querySelector(".places__list");
+
+// Находим все крестики для закрытия модальных окон
+const closeButtons = document.querySelectorAll(".popup__close");
 
 //Переменные для формы редактирования профиля
 const editButton = document.querySelector(".profile__edit-button");
@@ -66,11 +73,11 @@ function editNameModal(event) {
     .then((profile) => {
       profileTitle.textContent = profile.name;
       profileDescription.textContent = profile.about;
+      closeModal(popupEdit);
     })
     .catch((err) => console.log(err))
     .finally(() => {
       renderLoader(false, event.target);
-      closeModal(popupEdit);
     });
 }
 
@@ -102,10 +109,10 @@ function addCard(event) {
           deleteLike
         )
       );
+      closeModal(popupAdd);
     })
     .catch((err) => console.log(err))
     .finally(() => {
-      closeModal(popupAdd);
       renderLoader(false, event.target);
     });
 }
@@ -117,12 +124,12 @@ function changeAvatar(evt) {
 
   const avatarlink = formAvatar.elements.avatar;
   updateAvatar(avatarlink.value)
-    .then((avatar) => {
-      profileImage.style.backgroundImage = `url(${avatar})`;
+    .then((userData) => {
+      profileImage.style.backgroundImage = `url(${userData.avatar})`;
+      closeModal(popupAvatar);
     })
     .catch((err) => console.log(err))
     .finally(() => {
-      closeModal(popupAvatar);
       renderLoader(false, evt.target);
     });
 
@@ -170,35 +177,25 @@ editButton.addEventListener("click", () => {
   nameFormEdit.value = profileTitle.textContent;
   descriptionFormEdit.value = profileDescription.textContent;
 
-  clearValidation(formEdit);
+  clearValidation(formEdit, settingsValidation);
   openModal(popupEdit);
 });
 
 addButton.addEventListener("click", () => {
-  clearValidation(formAddCard);
+  clearValidation(formAddCard, settingsValidation);
   openModal(popupAdd);
 });
 
 profileImage.addEventListener("click", () => {
-  clearValidation(formAddCard);
+  clearValidation(formAvatar, settingsValidation);
   openModal(popupAvatar);
 });
 
 // Обработчики клика на крестик
-popupEdit.querySelector(".popup__close").addEventListener("click", () => {
-  closeModal(popupEdit);
-});
+closeButtons.forEach((button) => {
+  const popup = button.closest(".popup");
 
-popupAdd.querySelector(".popup__close").addEventListener("click", () => {
-  closeModal(popupAdd);
-});
-
-popupImage.querySelector(".popup__close").addEventListener("click", () => {
-  closeModal(popupImage);
-});
-
-popupAvatar.querySelector(".popup__close").addEventListener("click", () => {
-  closeModal(popupAvatar);
+  button.addEventListener("click", () => closeModal(popup));
 });
 
 // Обработчик для сохранения значений в форме редактирования профиля
@@ -209,6 +206,6 @@ formAddCard.addEventListener("submit", addCard);
 
 // Обработчик обновления аватара
 formAvatar.addEventListener("submit", changeAvatar);
-
+console.log(settingsValidation);
 // Включаем валидацию
-enableValidation();
+enableValidation(settingsValidation);

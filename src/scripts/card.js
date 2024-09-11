@@ -26,8 +26,11 @@ function createCard(
 
   // Обработчик удаления карточки при клике на корзину
   cardDeleteButton.addEventListener("click", () => {
-    deleteCard(cardElement);
-    deleteCardFromServer(data._id);
+    deleteCardFromServer(data._id)
+      .then(() => {
+        deleteCard(cardElement);
+      })
+      .catch((err) => console.log(err));
   });
 
   // Проверяем кто создатель карточки, если не я - убираем кнопку удаления

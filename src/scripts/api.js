@@ -4,82 +4,55 @@ const config = {
     authorization: "17dccafe-2ef1-4f66-949e-deec47f17770",
     "Content-Type": "application/json",
   },
-  id: "b23a164077ee38c7fdc7404b",
 };
 
-const checkFetchStatus = function (res) {
-  if (res.ok) {
-    return res.json();
-  } else {
-    return Promise.reject(`Ошибка: ${res.status}`);
-  }
-};
+function request(url, method, body = null) {
+  return fetch(url, {
+    method: method,
+    headers: config.headers,
+    body: body ? JSON.stringify(body) : null,
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
+    } else {
+      return Promise.reject(`Ошибка: ${res.status}`);
+    }
+  });
+}
 
 function getInitialCards() {
-  return fetch(`${config.baseUrl}/cards`, {
-    method: "GET",
-    headers: config.headers,
-  }).then(checkFetchStatus);
+  return request(`${config.baseUrl}/cards`, "GET");
 }
 
 function getDataUser() {
-  return fetch(`${config.baseUrl}/users/me`, {
-    method: "GET",
-    headers: config.headers,
-  }).then(checkFetchStatus);
+  return request(`${config.baseUrl}/users/me`, "GET");
 }
 
-function changeProfileValues(name, description) {
-  return fetch(`${config.baseUrl}/users/me`, {
-    method: "PATCH",
-    headers: config.headers,
-    body: JSON.stringify({
-      name: name,
-      about: description,
-    }),
-  }).then(checkFetchStatus);
-}
-
-function addNewCard(name, link) {
-  return fetch(`${config.baseUrl}/cards`, {
-    method: "POST",
-    headers: config.headers,
-    body: JSON.stringify({
-      name: name,
-      link: link,
-    }),
-  }).then(checkFetchStatus);
-}
-
-function deleteCardFromServer(cardIdd) {
-  fetch(`${config.baseUrl}/cards/${cardIdd}`, {
-    method: "DELETE",
-    headers: config.headers,
-  }).then(checkFetchStatus);
+function deleteCardFromServer(cardId) {
+  return request(`${config.baseUrl}/cards/${cardId}`, "DELETE");
 }
 
 function putLike(cardId) {
-  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
-    method: "PUT",
-    headers: config.headers,
-  }).then(checkFetchStatus);
+  return request(`${config.baseUrl}/cards/likes/${cardId}`, "PUT");
 }
 
 function deleteLike(cardId) {
-  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
-    method: "DELETE",
-    headers: config.headers,
-  }).then(checkFetchStatus);
+  return request(`${config.baseUrl}/cards/likes/${cardId}`, "DELETE");
+}
+
+function changeProfileValues(name, about) {
+  return request(`${config.baseUrl}/users/me`, "PATCH", { name, about });
+}
+
+function addNewCard(name, link) {
+  return request(`${config.baseUrl}/cards`, "POST", {
+    name,
+    link,
+  });
 }
 
 function updateAvatar(avatar) {
-  return fetch(`${config.baseUrl}/users/me/avatar`, {
-    method: "PATCH",
-    headers: config.headers,
-    body: JSON.stringify({
-      avatar,
-    }),
-  }).then(checkFetchStatus);
+  return request(`${config.baseUrl}/users/me/avatar`, "PATCH", { avatar });
 }
 
 export {
